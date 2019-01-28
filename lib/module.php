@@ -6,6 +6,8 @@
  * @license	https://opensource.org/licenses/MIT	MIT License
  */
 
+namespace Vendor\Bitrixmodule;
+
 /**
  * Class Module
  */

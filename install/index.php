@@ -5,6 +5,7 @@
  * @author Sergey Korshunov <sergey@korshunov.pro>
  * @license	https://opensource.org/licenses/MIT	MIT License
  */
+
 use \Bitrix\Main\Localization\Loc;
 
 Loc::loadMessages(__FILE__);
