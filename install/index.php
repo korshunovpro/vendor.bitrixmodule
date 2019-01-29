@@ -80,6 +80,7 @@ class vendor_bitrixmodule extends CModule
             $this->InstallFiles();
             $this->InstallDB();
             $this->InstallEvents();
+            $this->InstallAgents();
         } catch (\Exception $exception) {
             $this->APPLICATION->ThrowException($exception->getMessage());
         }
@@ -98,6 +99,7 @@ class vendor_bitrixmodule extends CModule
 
         $this->UnInstallFiles();
         $this->UnInstallEvents();
+        $this->UnInstallAgents();
         \Bitrix\Main\ModuleManager::unRegisterModule($this->MODULE_ID);
     }
 
