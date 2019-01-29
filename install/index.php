@@ -178,7 +178,7 @@ class vendor_bitrixmodule extends CModule
         $directory = new \DirectoryIterator($this->getPath() . '/admin/admin');
         /** @var \DirectoryIterator $entry */
         foreach ($directory as $entry) {
-            if ($entry->isDot() && $entry->getExtension() !== '.php') continue;
+            if ($entry->getExtension() !== '.php') continue;
             \Bitrix\Main\IO\File::deleteFile($_SERVER['DOCUMENT_ROOT'] . '/bitrix/admin/' . strtolower(__CLASS__) . '_' . $entry->getFilename());
         }
 
