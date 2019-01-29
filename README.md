@@ -1,2 +1,2 @@
 # vendor.bitrixmodule
-Bitrix module skeleton
+Bitrix D7 Module Skeleton
