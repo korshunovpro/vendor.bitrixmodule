@@ -46,7 +46,7 @@ class vendor_bitrixmodule extends CModule
      * @param bool $documentRoot
      * @return mixed
      */
-    public function GetPath($documentRoot = true)
+    public function getPath($documentRoot = true)
     {
         $dirname = str_ireplace(DIRECTORY_SEPARATOR, '/', dirname(__DIR__));
         if (!$documentRoot) {
@@ -56,56 +56,108 @@ class vendor_bitrixmodule extends CModule
     }
 
     /**
-     *
+     * @return array
      */
-    public function DoInstall()
+    public function getEntityClassList()
     {
-        \Bitrix\Main\ModuleManager::registerModule($this->MODULE_ID);
-        $this->InstallDB();
-        $this->InstallFiles();
-        $this->InstallEvents();
+        $result = [];
+        $directory = new \DirectoryIterator($this->getPath() . '/lib/entity');
+        /** @var \DirectoryIterator $entry */
+        foreach ($directory as $entry) {
+            if ($entry->isDot() && $entry->getExtension() !== '.php') continue;
+            $result[] = '\Vendor\Favorite\Entity\\' . ucfirst($entry->getBasename('.php') . 'Table');
+        }
+        return $result;
     }
 
     /**
-     *
+     * @return void
+     */
+    public function DoInstall()
+    {
+        try {
+            \Bitrix\Main\ModuleManager::registerModule($this->MODULE_ID);
+            $this->InstallFiles();
+            $this->InstallDB();
+            $this->InstallEvents();
+        } catch (\Exception $exception) {
+            $this->APPLICATION->ThrowException($exception->getMessage());
+        }
+    }
+
+    /**
+     * @return void
      */
     public function DoUninstall()
     {
-        $this->UnInstallDB();
+        try {
+            $this->UnInstallDB();
+        } catch (\Exception $exception) {
+            $this->APPLICATION->ThrowException($exception->getMessage());
+        }
+
         $this->UnInstallFiles();
         $this->UnInstallEvents();
         \Bitrix\Main\ModuleManager::unRegisterModule($this->MODULE_ID);
     }
 
     /**
-     * @return bool
+     * @return void
+     * @throws \Bitrix\Main\ArgumentException
+     * @throws \Bitrix\Main\Db\SqlQueryException
+     * @throws \Bitrix\Main\LoaderException
+     * @throws \Bitrix\Main\SystemException
      */
     public function InstallDB()
     {
-        return false;
+        \Bitrix\Main\Loader::includeModule($this->MODULE_ID);
+        foreach ($this->getEntityClassList() as $className) {
+            /** @var \Vendor\Favorite\Entity $className */
+            $entity = $className::getEntity();
+            $connection = $entity->getConnection();
+            $tableName = $entity->getDBTableName();
+
+            if (!$connection->isTableExists($tableName)) {
+                $entity->createDbTable();
+                $className::createIndexes($connection);
+            }
+        }
     }
 
     /**
-     * @return bool|void
+     * @throws \Bitrix\Main\ArgumentException
+     * @throws \Bitrix\Main\Db\SqlQueryException
+     * @throws \Bitrix\Main\LoaderException
+     * @throws \Bitrix\Main\SystemException
      */
     public function UnInstallDB()
     {
-        return true;
+        \Bitrix\Main\Loader::includeModule($this->MODULE_ID);
+        foreach ($this->getEntityClassList() as $className) {
+            /** @var \Vendor\Favorite\Entity $className */
+            $entity = $className::getEntity();
+            $connection = $entity->getConnection();
+            $tableName = $entity->getDBTableName();
+
+            if ($connection->isTableExists($tableName)) {
+                $connection->dropTable($tableName);
+            }
+        }
     }
 
     /**
-     * @return bool|void
+     * @return void
      */
     public function InstallFiles()
     {
         //install admin files
-        $directory = new \DirectoryIterator($this->GetPath() . '/admin/admin');
+        $directory = new \DirectoryIterator($this->getPath() . '/admin/admin');
         /** @var \DirectoryIterator $entry */
         foreach ($directory as $entry) {
             if ($entry->getExtension() !== '.php') continue;
             file_put_contents(
                 $_SERVER['DOCUMENT_ROOT'] . '/bitrix/admin/' . strtolower(__CLASS__) . '_' . $entry->getFilename(),
-                '<?php' . ' require(\'' . $this->GetPath() . '/admin/admin/' . $entry->getFilename() . '\');' . ' ?>'
+                '<?php' . ' require(\'' . $this->getPath() . '/admin/admin/' . $entry->getFilename() . '\');' . ' ?>'
             );
         }
 
@@ -121,7 +173,7 @@ class vendor_bitrixmodule extends CModule
     public function UnInstallFiles()
     {
         // uninstall admin files
-        $directory = new \DirectoryIterator($this->GetPath() . '/admin/admin');
+        $directory = new \DirectoryIterator($this->getPath() . '/admin/admin');
         /** @var \DirectoryIterator $entry */
         foreach ($directory as $entry) {
             if ($entry->isDot() && $entry->getExtension() !== '.php') continue;
