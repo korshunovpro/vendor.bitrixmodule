@@ -22,16 +22,16 @@ if ($APPLICATION::GetGroupRight(Module::getModuleId()) > 'D') {
         'parent_menu' => 'global_menu_services',
         'section' => Module::getModulePrefix(),
         'sort' => 900,
-        'text' => Loc::getMessage('VENDOR_PREFIX_MENU_MODULE_TITLE'),
-        'title' => Loc::getMessage('VENDOR_PREFIX_MENU_MODULE_TEXT'),
+        'text' => Loc::getMessage('VENDOR_BITRIXMODULE_MENU_MODULE_TITLE'),
+        'title' => Loc::getMessage('VENDOR_BITRIXMODULE_MENU_MODULE_TEXT'),
         'icon' => Module::getModulePrefix() . '-icon',
         'items_id' => 'menu_' . Module::getModulePrefix(),
         'items' => [
             [
-                'text' => Loc::getMessage('VENDOR_PREFIX_MENU_PAGE_EDIT_TEXT'),
+                'text' => Loc::getMessage('VENDOR_BITRIXMODULE_MENU_PAGE_EDIT_TEXT'),
                 'url' => Module::getModulePrefix() . '_edit.php?lang=' . LANGUAGE_ID,
                 'more_url' => [Module::getModulePrefix() . '_edit.php'],
-                'title' => Loc::getMessage('VENDOR_PREFIX_MENU_PAGE_EDIT_TITLE'),
+                'title' => Loc::getMessage('VENDOR_BITRIXMODULE_MENU_PAGE_EDIT_TITLE'),
             ]
         ]
     ];

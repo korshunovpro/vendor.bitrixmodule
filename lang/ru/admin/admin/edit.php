@@ -6,4 +6,4 @@
  * @license	https://opensource.org/licenses/MIT	MIT License
  */
 
-$MESS['VENDOR_PREFIX_PAGE_EDIT_TITLE'] = 'Module admin page';
+$MESS['VENDOR_BITRIXMODULE_PAGE_EDIT_TITLE'] = 'Module admin page';

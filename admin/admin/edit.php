@@ -15,7 +15,7 @@ use Bitrix\Main\Localization\Loc;
 
 Loc::loadMessages(__FILE__);
 
-$APPLICATION->SetTitle(Loc::getMessage('VENDOR_PREFIX_PAGE_EDIT_TITLE'));
+$APPLICATION->SetTitle(Loc::getMessage('VENDOR_BITRIXMODULE_PAGE_EDIT_TITLE'));
 
 // html, js & php code
 

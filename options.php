@@ -28,31 +28,31 @@ $request = Bitrix\Main\HttpApplication::getInstance()->getContext()->getRequest(
 $arAllOptions = [];
 
 // heading
-$arAllOptions['module'][] = Loc::getMessage('VENDOR_PREFIX_OPT_MAIN');
+$arAllOptions['module'][] = Loc::getMessage('VENDOR_BITRIXMODULE_OPT_MAIN');
 
 // note
-$arAllOptions['module'][] = ['note' => Loc::getMessage('VENDOR_PREFIX_INFO')];
+$arAllOptions['module'][] = ['note' => Loc::getMessage('VENDOR_BITRIXMODULE_INFO')];
 
 // option
 $arAllOptions['module'][] = [
     '', // name
-    '<p><b>' . Loc::getMessage('VENDOR_PREFIX_OPT_HTML_NAME') . '</b></p>', // option title
-    '<p><b>' . Loc::getMessage('VENDOR_PREFIX_OPT_HTML_DESC') . '</b></p>', //
+    '<p><b>' . Loc::getMessage('VENDOR_BITRIXMODULE_OPT_HTML_NAME') . '</b></p>', // option title
+    '<p><b>' . Loc::getMessage('VENDOR_BITRIXMODULE_OPT_HTML_DESC') . '</b></p>', //
     ['statichtml']
 ];
 
 // option
 $arAllOptions['module'][] = [
     '',
-    Loc::getMessage('VENDOR_PREFIX_OPT_TEXT_NAME'),
-    Loc::getMessage('VENDOR_PREFIX_OPT_TEXT_DESC'),
+    Loc::getMessage('VENDOR_BITRIXMODULE_OPT_TEXT_NAME'),
+    Loc::getMessage('VENDOR_BITRIXMODULE_OPT_TEXT_DESC'),
     ['statictext']
 ];
 
 // option
 $arAllOptions['module'][] = [
     'option_3',
-    Loc::getMessage('VENDOR_PREFIX_OPT_TEXTAREA_NAME'),
+    Loc::getMessage('VENDOR_BITRIXMODULE_OPT_TEXTAREA_NAME'),
     '',
     ['textarea', 10, 50]
 ];
@@ -60,18 +60,18 @@ $arAllOptions['module'][] = [
 // option
 $arAllOptions['module'][] = [
     'option_4',
-    Loc::getMessage('VENDOR_PREFIX_OPT_INPUT_NAME'),
+    Loc::getMessage('VENDOR_BITRIXMODULE_OPT_INPUT_NAME'),
     '',
     ['text', 10]
 ];
 
 // option
-$arAllOptions['module'][] = Loc::getMessage('VENDOR_PREFIX_OPT_ADDITIONAL');
+$arAllOptions['module'][] = Loc::getMessage('VENDOR_BITRIXMODULE_OPT_ADDITIONAL');
 
 // option
 $arAllOptions['module'][] = [
     'option_5',
-    Loc::getMessage('VENDOR_PREFIX_OPT_MULTISELECT_NAME'),
+    Loc::getMessage('VENDOR_BITRIXMODULE_OPT_MULTISELECT_NAME'),
     '', [
         'multiselectbox', [
             'var1' => 'var1',
@@ -85,7 +85,7 @@ $arAllOptions['module'][] = [
 // option
 $arAllOptions['module'][] = [
     'option_6',
-    Loc::getMessage('VENDOR_PREFIX_OPT_SELECT_NAME'),
+    Loc::getMessage('VENDOR_BITRIXMODULE_OPT_SELECT_NAME'),
     '', [
         'selectbox', [
             'var1' => 'var1',
@@ -99,7 +99,7 @@ $arAllOptions['module'][] = [
 // option
 $arAllOptions['module'][] = [
     'option_7',
-    Loc::getMessage('VENDOR_PREFIX_OPT_CHECKBOX_NAME'),
+    Loc::getMessage('VENDOR_BITRIXMODULE_OPT_CHECKBOX_NAME'),
     'val1',
     ['checkbox']
 ];
@@ -107,7 +107,7 @@ $arAllOptions['module'][] = [
 // option
 $arAllOptions['module'][] = [
     'option_8',
-    Loc::getMessage('VENDOR_PREFIX_OPT_CHECKBOX_NAME'),
+    Loc::getMessage('VENDOR_BITRIXMODULE_OPT_CHECKBOX_NAME'),
     'val2',
     ['checkbox']
 ];
@@ -115,7 +115,7 @@ $arAllOptions['module'][] = [
 // option
 $arAllOptions['module'][] = [
     'option_9',
-    Loc::getMessage('VENDOR_PREFIX_OPT_CHECKBOX_NAME'),
+    Loc::getMessage('VENDOR_BITRIXMODULE_OPT_CHECKBOX_NAME'),
     'val3',
     ['checkbox']
 ];
@@ -123,7 +123,7 @@ $arAllOptions['module'][] = [
 // Tabs
 $aTabs[] = [
     'DIV' => 'edit1',
-    'TAB' => Loc::getMessage('VENDOR_PREFIX_OPT_MAIN'),
+    'TAB' => Loc::getMessage('VENDOR_BITRIXMODULE_OPT_MAIN'),
     'TITLE' => Loc::getMessage('MAIN_TAB_TITLE_SET'),
     'OPTIONS' => $arAllOptions['module']
 ];

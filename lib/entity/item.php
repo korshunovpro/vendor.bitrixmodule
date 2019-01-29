@@ -6,7 +6,7 @@
  * @license	https://opensource.org/licenses/MIT	MIT License
  */
 
-namespace Vendor\Bitrixmodule;
+namespace Vendor\Bitrixmodule\Entity;
 
 use Bitrix\Main\ORM\Fields;
 
@@ -14,7 +14,7 @@ use Bitrix\Main\ORM\Fields;
  * Class Item
  * @package Vendor\Bitrixmodule
  */
-class ItemTable extends Entity
+class ItemTable extends \Vendor\Bitrixmodule\Entity
 {
     /**
      * @return string

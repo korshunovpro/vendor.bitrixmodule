@@ -32,11 +32,11 @@ class vendor_bitrixmodule extends CModule
         $this->MODULE_ID = str_replace('_', '.', __CLASS__);
         $this->MODULE_VERSION = $arModuleVersion['VERSION'];
         $this->MODULE_VERSION_DATE = $arModuleVersion['VERSION_DATE'];
-        $this->MODULE_NAME = Loc::getMessage('VENDOR_PREFIX_MODULE_NAME');
-        $this->MODULE_DESCRIPTION = Loc::getMessage('VENDOR_PREFIX_MODULE_DESC');
+        $this->MODULE_NAME = Loc::getMessage('VENDOR_BITRIXMODULE_MODULE_NAME');
+        $this->MODULE_DESCRIPTION = Loc::getMessage('VENDOR_BITRIXMODULE_MODULE_DESC');
 
-        $this->PARTNER_NAME = Loc::getMessage('VENDOR_PREFIX_PARTNER_NAME');
-        $this->PARTNER_URI = Loc::getMessage('VENDOR_PREFIX_PARTNER_URI');
+        $this->PARTNER_NAME = Loc::getMessage('VENDOR_BITRIXMODULE_PARTNER_NAME');
+        $this->PARTNER_URI = Loc::getMessage('VENDOR_BITRIXMODULE_PARTNER_URI');
 
         $this->SHOW_SUPER_ADMIN_GROUP_RIGHTS = 'Y';
         $this->MODULE_GROUP_RIGHTS = 'Y';
@@ -64,8 +64,8 @@ class vendor_bitrixmodule extends CModule
         $directory = new \DirectoryIterator($this->getPath() . '/lib/entity');
         /** @var \DirectoryIterator $entry */
         foreach ($directory as $entry) {
-            if ($entry->getExtension() !== '.php') continue;
-            $result[] = '\Vendor\Favorite\Entity\\' . ucfirst($entry->getBasename('.php') . 'Table');
+            if ($entry->getExtension() !== 'php') continue;
+            $result[] = '\Vendor\Bitrixmodule\Entity\\' . ucfirst($entry->getBasename('.php') . 'Table');
         }
         return $result;
     }
@@ -114,7 +114,7 @@ class vendor_bitrixmodule extends CModule
     {
         \Bitrix\Main\Loader::includeModule($this->MODULE_ID);
         foreach ($this->getEntityClassList() as $className) {
-            /** @var \Vendor\Favorite\Entity $className */
+            /** @var \Vendor\Bitrixmodule\Entity $className */
             $entity = $className::getEntity();
             $connection = $entity->getConnection();
             $tableName = $entity->getDBTableName();
@@ -136,7 +136,7 @@ class vendor_bitrixmodule extends CModule
     {
         \Bitrix\Main\Loader::includeModule($this->MODULE_ID);
         foreach ($this->getEntityClassList() as $className) {
-            /** @var \Vendor\Favorite\Entity $className */
+            /** @var \Vendor\Bitrixmodule\Entity $className */
             $entity = $className::getEntity();
             $connection = $entity->getConnection();
             $tableName = $entity->getDBTableName();
@@ -156,7 +156,7 @@ class vendor_bitrixmodule extends CModule
         $directory = new \DirectoryIterator($this->getPath() . '/admin/admin');
         /** @var \DirectoryIterator $entry */
         foreach ($directory as $entry) {
-            if ($entry->getExtension() !== '.php') continue;
+            if ($entry->getExtension() !== 'php') continue;
             file_put_contents(
                 $_SERVER['DOCUMENT_ROOT'] . '/bitrix/admin/' . strtolower(__CLASS__) . '_' . $entry->getFilename(),
                 '<?php' . ' require(\'' . $this->getPath() . '/admin/admin/' . $entry->getFilename() . '\');' . ' ?>'
@@ -178,7 +178,7 @@ class vendor_bitrixmodule extends CModule
         $directory = new \DirectoryIterator($this->getPath() . '/admin/admin');
         /** @var \DirectoryIterator $entry */
         foreach ($directory as $entry) {
-            if ($entry->getExtension() !== '.php') continue;
+            if ($entry->getExtension() !== 'php') continue;
             \Bitrix\Main\IO\File::deleteFile($_SERVER['DOCUMENT_ROOT'] . '/bitrix/admin/' . strtolower(__CLASS__) . '_' . $entry->getFilename());
         }
 
