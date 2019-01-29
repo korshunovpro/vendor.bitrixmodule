@@ -64,7 +64,7 @@ class vendor_bitrixmodule extends CModule
         $directory = new \DirectoryIterator($this->getPath() . '/lib/entity');
         /** @var \DirectoryIterator $entry */
         foreach ($directory as $entry) {
-            if ($entry->isDot() && $entry->getExtension() !== '.php') continue;
+            if ($entry->getExtension() !== '.php') continue;
             $result[] = '\Vendor\Favorite\Entity\\' . ucfirst($entry->getBasename('.php') . 'Table');
         }
         return $result;
