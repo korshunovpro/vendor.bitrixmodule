@@ -7,6 +7,7 @@
  */
 
 use \Bitrix\Main\Localization\Loc;
+use Bitrix\Main\Application;
 
 Loc::loadMessages(__FILE__);
 
@@ -42,11 +43,27 @@ class vendor_bitrixmodule extends CModule
     }
 
     /**
+     * @param bool $documentRoot
+     * @return mixed
+     */
+    public function GetPath($documentRoot = true)
+    {
+        $dirname = str_ireplace(DIRECTORY_SEPARATOR, '/', dirname(__DIR__));
+        if (!$documentRoot) {
+            return str_ireplace(Application::getDocumentRoot(), '', $dirname);
+        }
+        return $dirname;
+    }
+
+    /**
      *
      */
     public function DoInstall()
     {
         \Bitrix\Main\ModuleManager::registerModule($this->MODULE_ID);
+        $this->InstallDB();
+        $this->InstallFiles();
+        $this->InstallEvents();
     }
 
     /**
@@ -54,6 +71,9 @@ class vendor_bitrixmodule extends CModule
      */
     public function DoUninstall()
     {
+        $this->UnInstallDB();
+        $this->UnInstallFiles();
+        $this->UnInstallEvents();
         \Bitrix\Main\ModuleManager::unRegisterModule($this->MODULE_ID);
     }
 
@@ -78,7 +98,21 @@ class vendor_bitrixmodule extends CModule
      */
     public function InstallFiles()
     {
-        return true;
+        //install admin files
+        $directory = new \DirectoryIterator($this->GetPath() . '/admin/admin');
+        /** @var \DirectoryIterator $entry */
+        foreach ($directory as $entry) {
+            if ($entry->getExtension() !== '.php') continue;
+            file_put_contents(
+                $_SERVER['DOCUMENT_ROOT'] . '/bitrix/admin/' . strtolower(__CLASS__) . '_' . $entry->getFilename(),
+                '<?php' . ' require(\'' . $this->GetPath() . '/admin/admin/' . $entry->getFilename() . '\');' . ' ?>'
+            );
+        }
+
+        // install other files
+        CopyDirFiles(__DIR__ . '/css', $_SERVER['DOCUMENT_ROOT'] . '/bitrix/css/' . $this->MODULE_ID . '/', true, true);
+        CopyDirFiles(__DIR__ . '/js', $_SERVER['DOCUMENT_ROOT'] . '/bitrix/js/' . $this->MODULE_ID . '/', true, true);
+        CopyDirFiles(__DIR__ . '/images', $_SERVER['DOCUMENT_ROOT'] . '/bitrix/images/' . $this->MODULE_ID . '/', true, true);
     }
 
     /**
@@ -86,7 +120,18 @@ class vendor_bitrixmodule extends CModule
      */
     public function UnInstallFiles()
     {
-        return true;
+        // uninstall admin files
+        $directory = new \DirectoryIterator($this->GetPath() . '/admin/admin');
+        /** @var \DirectoryIterator $entry */
+        foreach ($directory as $entry) {
+            if ($entry->isDot() && $entry->getExtension() !== '.php') continue;
+            \Bitrix\Main\IO\File::deleteFile($_SERVER['DOCUMENT_ROOT'] . '/bitrix/admin/' . strtolower(__CLASS__) . '_' . $entry->getFilename());
+        }
+
+        // uninstall other files
+        DeleteDirFilesEx('/bitrix/css/' . $this->MODULE_ID . '/');
+        DeleteDirFilesEx('/bitrix/js/' . $this->MODULE_ID . '/');
+        DeleteDirFilesEx('/bitrix/images/' . $this->MODULE_ID . '/');
     }
 
     /**
@@ -101,6 +146,22 @@ class vendor_bitrixmodule extends CModule
      * @return bool|void
      */
     public function UnInstallEvents()
+    {
+        return true;
+    }
+
+    /**
+     * @return bool|void
+     */
+    public function InstallAgents()
+    {
+        return true;
+    }
+
+    /**
+     * @return bool|void
+     */
+    public function UnInstallAgents()
     {
         return true;
     }
