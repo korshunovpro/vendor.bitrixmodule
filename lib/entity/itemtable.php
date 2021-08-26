@@ -11,31 +11,37 @@ namespace Vendor\Bitrixmodule\Entity;
 use Bitrix\Main\ORM\Fields;
 
 /**
- * Class Item
+ * Class ItemTable
  * @package Vendor\Bitrixmodule
  */
-class ItemTable extends \Vendor\Bitrixmodule\Entity
+class ItemTable extends \Vendor\Bitrixmodule\BaseTable
 {
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public static function getTableName()
+    public static function getTableName(): string
     {
         return 'vendor_bitrixmodule_item';
     }
 
     /**
-     * @return array
-     * @throws \Bitrix\Main\SystemException
+     * {@inheritdoc}
      */
-    public static function getMap()
+    public static function getMap(): array
     {
         $map = [
-            // entity data
             new Fields\StringField('NAME', ['required' => true]),
             new Fields\TextField('DESCRIPTION'),
         ];
 
         return array_merge(parent::getMap(), $map);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getIndexes(): array
+    {
+        return [];
     }
 }

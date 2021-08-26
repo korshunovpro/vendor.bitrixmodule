@@ -9,214 +9,141 @@
 use \Bitrix\Main\Localization\Loc;
 use Bitrix\Main\Application;
 
-Loc::loadMessages(__FILE__);
-
 /**
  * Class vendor_bitrixmodule
  */
-class vendor_bitrixmodule extends CModule
+class vendor_bitrixmodule extends Vendor\Bitrixmodule\Module
 {
     /**
-     * @var CAllMain|CMain|null
+     * {@inheritdoc}.
      */
-    private $APPLICATION = null;
-
-    public function __construct()
+    public function getName(): string
     {
-        global $APPLICATION;
-        $this->APPLICATION = $APPLICATION;
-
-        $arModuleVersion = [];
-        require __DIR__ . '/version.php';
-
-        $this->MODULE_ID = str_replace('_', '.', __CLASS__);
-        $this->MODULE_VERSION = $arModuleVersion['VERSION'];
-        $this->MODULE_VERSION_DATE = $arModuleVersion['VERSION_DATE'];
-        $this->MODULE_NAME = Loc::getMessage('VENDOR_BITRIXMODULE_MODULE_NAME');
-        $this->MODULE_DESCRIPTION = Loc::getMessage('VENDOR_BITRIXMODULE_MODULE_DESC');
-
-        $this->PARTNER_NAME = Loc::getMessage('VENDOR_BITRIXMODULE_PARTNER_NAME');
-        $this->PARTNER_URI = Loc::getMessage('VENDOR_BITRIXMODULE_PARTNER_URI');
-
-        $this->SHOW_SUPER_ADMIN_GROUP_RIGHTS = 'Y';
-        $this->MODULE_GROUP_RIGHTS = 'Y';
+        return Loc::getMessage('VENDOR_BITRIXMODULE_MODULE_NAME');
     }
 
     /**
-     * @param bool $documentRoot
-     * @return mixed
+     * {@inheritdoc}.
      */
-    public function getPath($documentRoot = true)
+    public function getDescription(): string
     {
-        $dirname = str_ireplace(DIRECTORY_SEPARATOR, '/', dirname(__DIR__));
-        if (!$documentRoot) {
-            return str_ireplace(Application::getDocumentRoot(), '', $dirname);
-        }
-        return $dirname;
+        return Loc::getMessage('VENDOR_BITRIXMODULE_MODULE_DESC');
     }
 
     /**
-     * @return array
+     * {@inheritdoc}.
      */
-    public function getEntityClassList()
+    public function getPartnerName(): string
     {
-        $result = [];
-        $directory = new \DirectoryIterator($this->getPath() . '/lib/entity');
-        /** @var \DirectoryIterator $entry */
-        foreach ($directory as $entry) {
-            if ($entry->getExtension() !== 'php') continue;
-            $result[] = '\Vendor\Bitrixmodule\Entity\\' . ucfirst($entry->getBasename('.php') . 'Table');
-        }
-        return $result;
+        return Loc::getMessage('VENDOR_BITRIXMODULE_PARTNER_NAME');
     }
 
     /**
-     * @return void
+     * {@inheritdoc}.
      */
-    public function DoInstall()
+    public function getPartnerUri(): string
     {
-        try {
-            \Bitrix\Main\ModuleManager::registerModule($this->MODULE_ID);
-            $this->InstallFiles();
-            $this->InstallDB();
-            $this->InstallEvents();
-            $this->InstallAgents();
-        } catch (\Exception $exception) {
-            $this->APPLICATION->ThrowException($exception->getMessage());
-        }
+        return Loc::getMessage('VENDOR_BITRIXMODULE_PARTNER_URI');
     }
 
     /**
-     * @return void
+     * {@inheritdoc}.
      */
-    public function DoUninstall()
+    public function getDir(): string
     {
-        try {
-            $this->UnInstallDB();
-        } catch (\Exception $exception) {
-            $this->APPLICATION->ThrowException($exception->getMessage());
-        }
-
-        $this->UnInstallFiles();
-        $this->UnInstallEvents();
-        $this->UnInstallAgents();
-        \Bitrix\Main\ModuleManager::unRegisterModule($this->MODULE_ID);
+        return __DIR__;
     }
 
     /**
-     * @return void
-     * @throws \Bitrix\Main\ArgumentException
-     * @throws \Bitrix\Main\Db\SqlQueryException
-     * @throws \Bitrix\Main\LoaderException
-     * @throws \Bitrix\Main\SystemException
+     * {@inheritdoc}
      */
-    public function InstallDB()
+    public function getModuleTableClasses(): array
     {
-        \Bitrix\Main\Loader::includeModule($this->MODULE_ID);
-        foreach ($this->getEntityClassList() as $className) {
-            /** @var \Vendor\Bitrixmodule\Entity $className */
+        return [
+            \Vendor\Bitrixmodule\Entity\ItemTable::class,
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getModuleFiles(): array
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getModuleEvents(): array
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getModuleAgents(): array
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getModuleTasks(): array
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function doInstall()
+    {
+        parent::doInstall();
+
+        foreach ($this->getModuleTableClasses() as $className) {
+            /** @var BaseTable $className */
             $entity = $className::getEntity();
             $connection = $entity->getConnection();
-            $tableName = $entity->getDBTableName();
 
-            if (!$connection->isTableExists($tableName)) {
-                $entity->createDbTable();
-                $className::createIndexes($connection);
+            if (method_exists($className, 'afterCreateTable')) {
+                $className::afterCreateTable();
+            }
+
+            foreach ($className::getIndexes() as $k => $columns) {
+                $connection->createIndex(
+                    $entity->getDBTableName(),
+                    'IX_' . $entity->getDBTableName() . '_' . $k,
+                    $columns
+                );
             }
         }
     }
 
     /**
-     * @throws \Bitrix\Main\ArgumentException
-     * @throws \Bitrix\Main\Db\SqlQueryException
-     * @throws \Bitrix\Main\LoaderException
-     * @throws \Bitrix\Main\SystemException
+     * {@inheritdoc}
      */
-    public function UnInstallDB()
+    public function doUninstall()
     {
-        \Bitrix\Main\Loader::includeModule($this->MODULE_ID);
-        foreach ($this->getEntityClassList() as $className) {
-            /** @var \Vendor\Bitrixmodule\Entity $className */
-            $entity = $className::getEntity();
-            $connection = $entity->getConnection();
-            $tableName = $entity->getDBTableName();
+        $this->APPLICATION->ThrowException(
+            Loc::getMessage(
+                'ERROR_UNINSTALL_DISABLED',
+                [
+                    '#MODULE#' => $this->MODULE_ID,
+                ]
+            )
+        );
 
-            if ($connection->isTableExists($tableName)) {
-                $connection->dropTable($tableName);
-            }
-        }
+        return false;
     }
 
     /**
-     * @return void
+     * Деинсталляция, кастомный метод для прямого вызова.
      */
-    public function InstallFiles()
+    public function doUninstallInternal()
     {
-        //install admin files
-        $directory = new \DirectoryIterator($this->getPath() . '/admin/admin');
-        /** @var \DirectoryIterator $entry */
-        foreach ($directory as $entry) {
-            if ($entry->getExtension() !== 'php') continue;
-            file_put_contents(
-                $_SERVER['DOCUMENT_ROOT'] . '/bitrix/admin/' . strtolower(__CLASS__) . '_' . $entry->getFilename(),
-                '<?php' . ' require(\'' . $this->getPath() . '/admin/admin/' . $entry->getFilename() . '\');' . ' ?>'
-            );
-        }
-
-        // install other files
-        CopyDirFiles(__DIR__ . '/css', $_SERVER['DOCUMENT_ROOT'] . '/bitrix/css/' . $this->MODULE_ID . '/', true, true);
-        CopyDirFiles(__DIR__ . '/js', $_SERVER['DOCUMENT_ROOT'] . '/bitrix/js/' . $this->MODULE_ID . '/', true, true);
-        CopyDirFiles(__DIR__ . '/images', $_SERVER['DOCUMENT_ROOT'] . '/bitrix/images/' . $this->MODULE_ID . '/', true, true);
-    }
-
-    /**
-     * @return bool|void
-     */
-    public function UnInstallFiles()
-    {
-        // uninstall admin files
-        $directory = new \DirectoryIterator($this->getPath() . '/admin/admin');
-        /** @var \DirectoryIterator $entry */
-        foreach ($directory as $entry) {
-            if ($entry->getExtension() !== 'php') continue;
-            \Bitrix\Main\IO\File::deleteFile($_SERVER['DOCUMENT_ROOT'] . '/bitrix/admin/' . strtolower(__CLASS__) . '_' . $entry->getFilename());
-        }
-
-        // uninstall other files
-        DeleteDirFilesEx('/bitrix/css/' . $this->MODULE_ID . '/');
-        DeleteDirFilesEx('/bitrix/js/' . $this->MODULE_ID . '/');
-        DeleteDirFilesEx('/bitrix/images/' . $this->MODULE_ID . '/');
-    }
-
-    /**
-     * @return bool|void
-     */
-    public function InstallEvents()
-    {
-        return true;
-    }
-
-    /**
-     * @return bool|void
-     */
-    public function UnInstallEvents()
-    {
-        return true;
-    }
-
-    /**
-     * @return bool|void
-     */
-    public function InstallAgents()
-    {
-        return true;
-    }
-
-    /**
-     * @return bool|void
-     */
-    public function UnInstallAgents()
-    {
-        return true;
+        parent::doUninstall();
     }
 }

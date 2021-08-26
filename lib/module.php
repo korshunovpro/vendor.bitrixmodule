@@ -1,10 +1,4 @@
 <?php
-/**
- * Bitrix module skeleton
- *
- * @author Sergey Korshunov <sergey@korshunov.pro>
- * @license	https://opensource.org/licenses/MIT	MIT License
- */
 
 namespace Vendor\Bitrixmodule;
 
@@ -18,27 +12,16 @@ use CModule;
 use Throwable;
 
 /**
- * Абстрактный базовый класс модуля Битрикс реализующий конструктор битрикс модуля
- * и методы инсталляции|деинсталляции.
+ * Абстрактный базовый класс модуля Битрикс с методами инсталляции деинсталляции.
  *
  * abstract Module.
  */
-abstract class Module extends CModule
+abstract class Module extends CModule implements ModuleInterface
 {
     /**
      * @var null|\CAllMain|\CMain
      */
     protected $APPLICATION;
-
-    /**
-     * Название модуля.
-     */
-    abstract public function getName(): string;
-
-    /**
-     * Должен возвращать значение константы __DIR__.
-     */
-    abstract public function getDir(): string;
 
     /**
      * Конструктор, стандартная инициализация Битрикс модуля.
@@ -65,7 +48,7 @@ abstract class Module extends CModule
     }
 
     /**
-     * ID модуля.
+     * {@inheritdoc}
      */
     public function getModuleId(): string
     {
@@ -124,12 +107,12 @@ abstract class Module extends CModule
                 $entity->createDbTable();
             }
 
-            // Проверка кастомного метода. Метод с действиями после создания таблицы.
-            if (method_exists($class, 'afterCreateDbTable')) {
-                $class::afterCreateDbTable();
+            // Метод с действиями после создания таблицы.
+            if (method_exists($class, 'afterCreateTable')) {
+                $class::afterCreateTable();
             }
 
-            // Проверка кастомного метода. Метод должен возвращать массив полей для индекса.
+            // Метод должен возвращать массив полей для индекса.
             if (method_exists($class, 'getIndexes') && is_array($class::getIndexes())) {
                 foreach ($class::getIndexes() as $k => $columns) {
                     $connection->createIndex(
@@ -298,160 +281,5 @@ abstract class Module extends CModule
     {
         $this->SHOW_SUPER_ADMIN_GROUP_RIGHTS = 'Y';
         $this->MODULE_GROUP_RIGHTS = 'Y';
-    }
-
-    /**
-     * Описание модуля.
-     */
-    public function getDescription(): string
-    {
-        return '';
-    }
-
-    /**
-     * Название партнера/разработчика модуля.
-     */
-    public function getPartnerName(): string
-    {
-        return '';
-    }
-
-    /**
-     * Ссылка на сайт партнера/разработчика модуля.
-     */
-    public function getPartnerUri(): string
-    {
-        return '';
-    }
-
-    /**
-     * Массив *Table классов модуля (может быть пустой).
-     *
-     * Пример:
-     *
-     * return [
-     *      'ModuleNamespace\SubNamespace\ClassNameFooTable',
-     *      'ModuleNamespace\SubNamespace\ClassNameBarTable',
-     * ]
-     */
-    public function getModuleTableClasses(): array
-    {
-        return [];
-    }
-
-    /**
-     * Массив файлов/директорий для установки (может быть пустой).
-     *
-     * Пример:
-     *
-     * return [
-     *      'full_path/install/admin/edit.php' => 'full_path/bitrix/admin/edit.php,
-     *      'full_path/install/admin/manage.php' => 'full_path/bitrix/admin/manage.php,
-     *      'full_path/install/js' => 'full_path/bitrix/js/module_id,
-     * ]
-     */
-    public function getModuleFiles(): array
-    {
-        return [];
-    }
-
-    /**
-     * Массив событий для установки (может быть пустой).
-     *
-     * Пример:
-     *
-     * return [
-     *      [
-     *          'fromModuleId' => 'main',
-     *          'eventType' => 'OnPageStart',
-     *          'toModuleId' => 'module_id',
-     *          'toClass' => 'Class',
-     *          'toMethod' => 'Method',
-     *          'sort' => '100',
-     *          'toPath' => '', // Путь к файлу который надо подключить относительно /local или /bitrix
-     *          'toMethodArg' => [$param1, $param2],
-     *      ], [
-     *          'fromModuleId' => 'main',
-     *          'eventType' => 'OnEpilog',
-     *          'toModuleId' => 'module_id',
-     *          'toClass' => 'Class',
-     *          'toMethod' => 'Method',
-     *          'sort' => '100000',
-     *          'toPath' => '', // Путь к файлу который надо подключить относительно /local или /bitrix
-     *          'toMethodArg' => [$param1, $param2],
-     *      ]
-     * ]
-     */
-    public function getModuleEvents(): array
-    {
-        return [];
-    }
-
-    /**
-     * Массив агентов для установки (может быть пустой).
-     *
-     * Пример:
-     *
-     * return [
-     *      [
-     *           'name' => 'Class::method();',          // строка, Функция агента
-     *           'module' => 'module_id',               // default = ''
-     *           'period' => '' ,                       // Y/N, default = N
-     *           'interval' => '',                      // sec, default = 86400, интервал запуска
-     *           'datecheck' => 'dd.mm.yyyy hh:mm:ss',  // default = now(), дата первой проверки на запуск
-     *           'active' => '',                        // Y/N, default = Y, активность
-     *           'next_exec' => 'dd.mm.yyyy hh:mm:ss',   // default = now(), дата первого запуска
-     *           'sort' => '',                          // default = 30, Сортировка
-     *           'user_id' => '',                       // default = false, пользователь
-     *           'existError' => '',                    // default = true, возвращать ошибку если агент существует
-     *     ], [
-     *           'name' => 'Class::method();',
-     *           'module' => 'module_id',
-     *           'period' => '' ,
-     *           'interval' => '',
-     *           'datecheck' => 'dd.mm.yyyy hh:mm:ss',
-     *           'active' => '',
-     *           'next_exec' => 'dd.mm.yyyy hh:mm:ss',
-     *           'sort' => '',
-     *           'user_id' => '',
-     *           'existError' => '',
-     *     ]
-     * ]
-     */
-    public function getModuleAgents(): array
-    {
-        return [];
-    }
-
-    /**
-     * Массив заданий для пользователя (может быть пустой).
-     *
-     * Пример:
-     *
-     * return [
-     *     [
-     *         'NAME' => [
-     *             'LETTER' => '',
-     *             'BINDING' => '',
-     *             'OPERATIONS' => [
-     *                 'NAME',
-     *                 'NAME',
-     *             ],
-     *         ],
-     *     ], [
-     *         'NAME' => [
-     *             'LETTER' => '',
-     *             'BINDING' => '',
-     *             'OPERATIONS' => [
-     *                 'NAME',
-     *                 'NAME',
-     *             ],
-     *         ],
-     *     ]
-     * ]
-     */
-    public function getModuleTasks()
-    {
-        return [];
     }
 }
